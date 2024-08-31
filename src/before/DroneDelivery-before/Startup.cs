@@ -1,13 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Swashbuckle.AspNetCore.Swagger;
-using DroneDelivery.Common.Services;
-using DroneDelivery_before.Services;
-using Microsoft.Extensions.Hosting;
-
-namespace DroneDelivery_before
+﻿namespace DroneDelivery_before
 {
     public class Startup
     {
@@ -33,7 +24,7 @@ namespace DroneDelivery_before
             // Enable swagger doc
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "DroneDelivery-before API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "DroneDelivery-before API", Version = "v1" });
             });
         }
 
@@ -61,6 +52,8 @@ namespace DroneDelivery_before
             });
 
             app.UseHttpsRedirection();
+
+            app.UseRouting();
 
             app.UseEndpoints(endpoints =>
             {

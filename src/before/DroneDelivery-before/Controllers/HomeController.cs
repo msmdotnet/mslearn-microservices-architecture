@@ -1,12 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Diagnostics;
-using System.Net.Http;
-using System.Threading.Tasks;
-using DroneDelivery.Common.Models;
-using Newtonsoft.Json;
-
-namespace DroneDelivery_before.Controllers
+﻿namespace DroneDelivery_before.Controllers
 {
     public class HomeController : Controller
     {
@@ -51,7 +43,7 @@ namespace DroneDelivery_before.Controllers
             stopWatch.Start();
 
             var httpClient = httpClientFactory.CreateClient();
-            var urlBuilder = new UriBuilder(this.Request.Scheme, this.Request.Host.Host);
+            var urlBuilder = new UriBuilder(this.Request.Scheme, this.Request.Host.Host, Request.Host.Port.Value);
             httpClient.BaseAddress = urlBuilder.Uri;
 
             var tasks = new Task[RequestCount];

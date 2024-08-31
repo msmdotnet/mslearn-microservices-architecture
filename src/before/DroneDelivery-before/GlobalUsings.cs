@@ -1,0 +1,16 @@
+global using DroneDelivery.Common.Services;
+global using DroneDelivery_before.Services;
+global using Microsoft.AspNetCore.Builder;
+global using Microsoft.AspNetCore.Hosting;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Hosting;
+global using Microsoft.OpenApi.Models;
+global using DroneDelivery.Common.Models;
+global using Microsoft.AspNetCore.Mvc;
+global using Newtonsoft.Json;
+global using System;
+global using System.Diagnostics;
+global using System.Net.Http;
+global using System.Threading.Tasks;
+global using Microsoft.Extensions.Logging;
