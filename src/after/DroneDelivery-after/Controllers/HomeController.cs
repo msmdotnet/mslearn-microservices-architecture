@@ -1,12 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Diagnostics;
-using System.Net.Http;
-using System.Threading.Tasks;
-using DroneDelivery.Common.Models;
-using Newtonsoft.Json;
-
-namespace DroneDelivery_after.Controllers
+﻿namespace DroneDelivery_after.Controllers
 {
     public class HomeController : Controller
     {
@@ -50,24 +42,23 @@ namespace DroneDelivery_after.Controllers
             stopWatch.Start();
 
             var httpClient = httpClientFactory.CreateClient();
-            var urlBuilder = new UriBuilder(this.Request.Scheme, this.Request.Host.Host);
+            var urlBuilder = new UriBuilder(this.Request.Scheme, this.Request.Host.Host, Request.Host.Port.Value);
             httpClient.BaseAddress = urlBuilder.Uri;
 
-            var tasks = new Task[RequestCount];
+            var tasks = new Task<HttpResponseMessage>[RequestCount];
 
             for (int i = 0; i < RequestCount; i++)
             {
-                string jsonString = JsonConvert.SerializeObject(payload);
-
-                var httpContent = new StringContent(jsonString, System.Text.Encoding.UTF8, "application/json");
-
-                tasks[i] = httpClient.PostAsync("/api/DeliveryRequests", httpContent);
+                tasks[i] = httpClient.PostAsJsonAsync("/api/DeliveryRequests", payload);
             }
 
             Task.WaitAll(tasks);
 
+            int Errors = tasks.AsParallel()
+                .Count(t => t.Result.StatusCode != System.Net.HttpStatusCode.Created);
+
             stopWatch.Stop();
-            ViewBag.Message = $"{RequestCount} messages sent in {stopWatch.Elapsed.Seconds} seconds";
+            ViewBag.Message = $"{RequestCount} messages sent in {stopWatch.Elapsed.Seconds} seconds with {Errors} errors";
             return View();
         }
     }
