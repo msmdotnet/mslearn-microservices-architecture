@@ -46,7 +46,12 @@ namespace DroneDelivery_before.Controllers
             stopWatch.Start();
 
             var httpClient = httpClientFactory.CreateClient();
-            var urlBuilder = new UriBuilder(this.Request.Scheme, this.Request.Host.Host, Request.Host.Port.Value);
+            UriBuilder urlBuilder;
+            if(Request.Host.HasValue)
+                urlBuilder = new UriBuilder(this.Request.Scheme, this.Request.Host.Host, Request.Host.Port.Value);
+            else
+                urlBuilder = new UriBuilder(this.Request.Scheme, this.Request.Host.Host);
+
             httpClient.BaseAddress = urlBuilder.Uri;
 
             var tasks = new Task<HttpResponseMessage>[RequestCount];
