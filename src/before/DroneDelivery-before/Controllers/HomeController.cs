@@ -42,32 +42,39 @@ namespace DroneDelivery_before.Controllers
         [Route("/[controller]/SendRequests")]
         public IActionResult SendRequests()
         {
-            var stopWatch = new Stopwatch();
-            stopWatch.Start();
-
-            var httpClient = httpClientFactory.CreateClient();
-            UriBuilder urlBuilder;
-            if(Request.Host.HasValue)
-                urlBuilder = new UriBuilder(this.Request.Scheme, this.Request.Host.Host, Request.Host.Port.Value);
-            else
-                urlBuilder = new UriBuilder(this.Request.Scheme, this.Request.Host.Host);
-
-            httpClient.BaseAddress = urlBuilder.Uri;
-
-            var tasks = new Task<HttpResponseMessage>[RequestCount];
-
-            for (int i = 0; i < RequestCount; i++)
+            try
             {
-                tasks[i] = httpClient.PostAsJsonAsync("/api/DeliveryRequests", payload);
+                var stopWatch = new Stopwatch();
+                stopWatch.Start();
+
+                var httpClient = httpClientFactory.CreateClient();
+                UriBuilder urlBuilder;
+                if (Request.Host.HasValue)
+                    urlBuilder = new UriBuilder(this.Request.Scheme, this.Request.Host.Host, Request.Host.Port.Value);
+                else
+                    urlBuilder = new UriBuilder(this.Request.Scheme, this.Request.Host.Host);
+
+                httpClient.BaseAddress = urlBuilder.Uri;
+
+                var tasks = new Task<HttpResponseMessage>[RequestCount];
+
+                for (int i = 0; i < RequestCount; i++)
+                {
+                    tasks[i] = httpClient.PostAsJsonAsync("/api/DeliveryRequests", payload);
+                }
+
+                Task.WaitAll(tasks);
+
+                int Errors = tasks.AsParallel()
+                    .Count(t => t.Result.StatusCode != System.Net.HttpStatusCode.Created);
+
+                stopWatch.Stop();
+                ViewBag.Message = $"{RequestCount} messages sent in {stopWatch.Elapsed.Seconds} seconds  with {Errors} errors";
             }
-
-            Task.WaitAll(tasks);
-
-            int Errors = tasks.AsParallel()
-                .Count(t => t.Result.StatusCode != System.Net.HttpStatusCode.Created);
-
-            stopWatch.Stop();
-            ViewBag.Message = $"{RequestCount} messages sent in {stopWatch.Elapsed.Seconds} seconds  with {Errors} errors";
+            catch (Exception ex)
+            {
+                ViewBag.Message = ex.ToString();
+            }
             return View();
         }
     }
